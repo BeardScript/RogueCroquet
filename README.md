@@ -54,9 +54,8 @@ import { RogueCroquet } from '@RE/RogueEngine/rogue-croquet';
 @RogueCroquet.Model
 export class MyViewModel extends BaseModel {}
 
+@RE.registerComponent
 export default class MyView extends CroquetView {}
-
-RE.registerComponent(MyView);
 
 ```
 
@@ -79,9 +78,8 @@ import { RogueCroquet } from '@RE/RogueEngine/rogue-croquet';
 @RogueCroquet.Model
 export class MyPawnModel extends Actor {}
 
+@RE.registerComponent
 export default class MyPawn extends CroquetPawn {}
-
-RE.registerComponent(MyPawn);
 
 ```
 
@@ -111,11 +109,10 @@ export class MyViewModel extends BaseModel {
   isStaticModel = true;
 }
 
+@RE.registerComponent
 export default class MyView extends CroquetView {
   isStaticModel = true;
 }
-
-RE.registerComponent(MyView);
 
 ```
 
@@ -142,6 +139,7 @@ export class MyViewModel extends BaseModel {
   }
 }
 
+@RE.registerComponent
 export default class MyView extends CroquetView {
   @MyViewModel.prop()
   counter = 0;
@@ -161,8 +159,6 @@ export default class MyView extends CroquetView {
   }
 }
 
-RE.registerComponent(MyView);
-
 ```
 
 ### Synchronize Actions
@@ -175,6 +171,7 @@ It works both with regular Model-Views and Actor-Pawns.
 @RogueCroquet.Model
 export class MyPawnModel extends Actor {}
 
+@RE.registerComponent
 export default class MyPawn extends CroquetPawn {
   @MyPawnModel.action()
   myAction() {
@@ -186,8 +183,6 @@ export default class MyPawn extends CroquetPawn {
     }
   }
 }
-
-RE.registerComponent(MyPawn);
 
 ```
 

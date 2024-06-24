@@ -192,41 +192,41 @@ export default class MyPawn extends CroquetPawn {
 
 ##### Properties
 
-**viewId: string**
+`viewId: string`
 The ID of the view related to this Model.
 
-**isStaticModel: boolean**
+`isStaticModel: boolean`
 When true, the model will have a single instance synchronized between all clients.
 
 ##### Methods
 
-**onInit()**
+`onInit()`
 This will be exectuted when this Model is initialized.
 
-**onRemoved()**
+`onRemoved()`
 This will be executed when this Model is removed an destroyed.
 
-**onBeforeUpdateProp(key: string, value: any)**
+`onBeforeUpdateProp(key: string, value: any)`
 This will be executed before a property **key** is updated with the given **value** by the View, using **updateProp()**
 
-**remove()**
+`remove()`
 This will handle the removal and destruction of this Model.
 
 ##### Decorators
 
-**prop(twoWayBind?: boolean)**
+`prop(twoWayBind?: boolean)`
 Used on the View's propertis to generate a bind between properties of the same name in the Model. You can pass in `true` as a parameter to give write access to the prop using **updateProp**
 
-**action()**
+`action()`
 Usen on a Method in the View's code to make it run on both the Model and the View.
 
 #### Actor
 
-(**extends BaseModel**)
+`extends BaseModel`
 
 ##### Properties
 
-**models: Map<string, BaseModel>**
+`models: Map<string, BaseModel>`
 A collection of all child models of this Actor.
 
 #### CroquetComponent
@@ -235,59 +235,58 @@ This is used internally to provide common API for **CroquetView** and **CroquetP
 
 ##### Properties
 
-**isStaticModel: boolean**
+`isStaticModel: boolean`
 Tells this View that the related model is Static, so we'll be synchronized to its ony instance.
 
-**model: BaseModel**
+`model: BaseModel`
 This is the last received version of the model related to this view. It's been serialized and parsed along the way so it doesn't hold any references.
 
-**view: Croquet.View**
+`view: Croquet.View`
 This is the View of our local client.
 
-**viewId: string**
+`viewId: string`
 This is the ID of the view managing this Model-View.
 
-**sessionId: string**
+`sessionId: string`
 The ID of the session where this View was created.
 
-**initialized: boolean**
+`initialized: boolean`
 This tells us whether both Model and View of this component have been initialized
 
-**isMe**
+`isMe: boolean`
 This tells us whether this Model-View is being managed by the local client.
 
 ##### Methods
 
-**init()**
+`init()`
 Runs when both the Model and View have been initialized.
 
-**onBeforeUpdateProp(key: string, value: any)**
+`onBeforeUpdateProp(key: string, value: any)`
 Runs right before the property **key** is updated with the given **value** by the Model.
 
-**updateProp(key: string)**
+`updateProp(key: string)`
 Updates the two-way bound prop with the given **key** in the Model with its current value.
 
-**dampV3(from: THREE.Vector3, to: THREE.Vector3, lambda: number)**
+`dampV3(from: THREE.Vector3, to: THREE.Vector3, lambda: number)`
 Frame independent, smooth interpolation **from** vector **to** vector. A higher **lambda** value will make the movement more sudden, and a lower value will make the movement more gradual. Interpolation will be applied directly to the **from** vector.
 
 #### CroquetView
 
-(**extends CroquetComponent**)
+`extends CroquetComponent`
 
 ##### Properties
 
-**parentPawn: CroquetPawn | undefined**
+`parentPawn: CroquetPawn | undefined`
 The parent Actor-Pawn of this Model-View if any.
 
 #### CroquetPawn
 
-(**extends CroquetComponent**)
+`extends CroquetComponent`
 
 ##### Properties
 
-**pawnPrefab: RE.Prefab**
-The Prefab to instantiate in other clients for this Actor-Pawn.
-Can be the same one as the local client.
+`pawnPrefab: RE.Prefab`
+The Prefab to instantiate in other clients for this Actor-Pawn. Can be the same one as the local client.
 
-**model: Actor**
+`model: Actor`
 Same as CroquetComponent.model only this will be an instance of Actor.

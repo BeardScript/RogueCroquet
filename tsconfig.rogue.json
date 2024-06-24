@@ -1,0 +1,42 @@
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "baseUrl": ".",
+    "outDir": "build/",
+    "module": "esnext",
+    "target": "ES2015",
+    "lib": ["es6", "dom", "es2015"],
+    "allowJs": true,
+    "moduleResolution": "node",
+    "rootDir": "./",
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noImplicitAny": false,
+    "importHelpers": true,
+    "strictNullChecks": true,
+    "noUnusedLocals": false,
+    "paths": {
+      "rogue-engine": [ "_Rogue/rogue-engine" ],
+      "@RE/*": [ "Assets/rogue_packages/*" ],
+      "three/nodes": [ "node_modules/@types/three/examples/jsm/nodes/Nodes" ],
+      "three/addons/*": [ "node_modules/@types/three/examples/jsm/*" ],
+    }
+  },
+  "include": [
+    "_Rogue/**/*",
+    "Assets/**/*",
+  ],
+  "exclude": [
+    "node_modules",
+    "build",
+    "scripts",
+    "acceptance-tests",
+    "webpack",
+    "jest",
+    "dist",
+    "src/setupTests.ts",
+    "public/MainProcess",
+    "src/MainProcess"
+  ]
+}

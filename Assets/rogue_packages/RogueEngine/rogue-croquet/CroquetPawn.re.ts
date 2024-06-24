@@ -1,0 +1,59 @@
+import * as RE from 'rogue-engine';
+import { RogueCroquet } from '.';
+import { Actor } from './Actor';
+import CroquetComponent from './CroquetComponent.re';
+
+export default class CroquetPawn extends CroquetComponent {
+  @RE.props.prefab() pawnPrefab: RE.Prefab;
+  model: Actor;
+
+  beforeUpdate() {
+    if (!this.initialized && RogueCroquet.rootView && !this.readySubscribed) {
+      this.sessionId = RogueCroquet.activeSessionId;
+      this.view = RogueCroquet.rootView;
+
+      this.view.subscribe(this.sessionId, "actorCreated", this.onModelCreated);
+
+      const params = {};
+
+      this.constructor["binds"]?.forEach(key => {
+        params[key] = this[key];
+      });
+
+      this.view.publish(this.sessionId, "createActor", {
+        pawnPrefab: this.pawnPrefab?.uuid || this.object3d.userData.__ASSET__,
+        modelName: this.constructor.name + "Model",
+        viewId: this.view.viewId,
+        params
+      });
+
+      this.readySubscribed = true;
+    }
+  }
+
+  onModelCreated = (params: {model: Actor, viewId: string}) => {
+    if (this.initialized || this.model) return;
+
+    this.model = params.model as Actor;
+    this.viewId = this.isStaticModel ? this.view.viewId : params.viewId;
+
+    if (!this.view) this.view = RogueCroquet.rootView;
+    this.sessionId = this.view.session.id;
+
+    this.initialized = true;
+
+    this.constructor["binds"]?.forEach(key => {
+      this[key] = this.model[key];
+      this.view.subscribe(this.model.id, key + "View", (data) => {
+        if (data.viewId === this.view.viewId) return;
+        this.onBeforeUpdateProp(key, data[key]);
+        this[key] = data[key];
+      });
+    });
+
+    this.init();
+  }
+}
+
+RE.registerComponent(CroquetPawn);
+        

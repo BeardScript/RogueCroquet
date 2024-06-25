@@ -6,18 +6,6 @@ The package is an early beta and may be missing some features, that said, given 
 
 This repo includes a skeleton project to act as a basic guide, along with the package itself in its corresponding folder.
 
-### How it works
-
-Croquet has a Model-View pattern, where clients running the exact same Model are synchronized through the use of [Multisynq](https://multisynq.io/) reflectors.
-
-In a regular client-server application the Model would be the equivalent of the net code, only in this case, it runs on the client. Since only those running the same Model can be synchronized within a Session, we can make client-side **authoritative** computations.
-
-The Views will provide the purely client-side code tied to the visuals.
-
-In this dynamic the View can read the Model but the Model can't read the View, although, they can receive messages from each other through a publish/subscribe mechanism.
-
-For more info on this check out the [Croquet docs](https://croquet.io/docs/croquet/).
-
 ### Instructions
 
 **The First thing** you need to do is [sign up for Croquet](https://croquet.io/account/) and get your **App ID** and **API Key**. Then create a file in `YourProject/Static` called `croquet.json` with the following content:
@@ -38,6 +26,18 @@ Then in the Editor you need to add the **CroquetConfig** component to an object 
 Now you're ready to start creating your own Models and Views to synchronize your players.
 
 **To use this project** simply clone it and open it with Rogue Engine. Open the project in two browser windows side by side. When you move the blue ball on one of them using WASD, you'll see the white ball moving on the other.
+
+### How it works
+
+Croquet has a Model-View pattern, where clients running the exact same Model are synchronized through the use of [Multisynq](https://multisynq.io/) reflectors.
+
+In a regular client-server application the Model would be the equivalent of the net code, only in this case, it runs on the client. Since only those running the same Model can be synchronized within a Session, we can make client-side **authoritative** computations.
+
+The Views will provide the purely client-side code tied to the visuals.
+
+In this dynamic the View can read the Model but the Model can't read the View, although, they can receive messages from each other through a publish/subscribe mechanism.
+
+For more info on this check out the [Croquet docs](https://croquet.io/docs/croquet/).
 
 ### The Rogue Croquet Model-View
 

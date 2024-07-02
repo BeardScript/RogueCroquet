@@ -1,5 +1,7 @@
 ## Rogue Croquet
 
+<img src="/Static/rogue-croquet.webp" alt="RogueCroquet" title="RogueCroquet"/> 
+
 This is an integration package of [Croquet](https://croquet.io/index.html) for [Rogue Engine](https://rogueengine.io/) to provide networking capabilities without the need for a server.
 
 The package is an early beta and may be missing some features, that said, given how Croquet itself is very mature and production ready, you should be safe to us this package in production. This project is open source and open for contributions.

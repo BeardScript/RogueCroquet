@@ -21,9 +21,10 @@ export class BaseModel extends Croquet.Model {
   }
 
   private handleBinds(data: {key: string, value: any, viewId: string}) {
-    this.onBeforeUpdateProp(data.key, data.value);
-    this["_" + data.key] = data.value;
-    this.publish(this.id, data.key + "View", {[data.key]: data.value, viewId: data.viewId});
+    const value = this.onBeforeUpdateProp(data.key, data.value);
+    const changed = value !== undefined;
+    this["_" + data.key] = changed ? value : data.value;
+    this.publish(this.id, data.key + "View", {[data.key]: this["_" + data.key], viewId: data.viewId, changed});
   }
 
   private handleActions(data: {key: string, args: any[]}) {
@@ -43,7 +44,7 @@ export class BaseModel extends Croquet.Model {
 
   onRemoved() {}
 
-  static prop(twoWay = false) {
+  static prop(twoWay: boolean | number = false) {
     return (target: Object, key: string, descriptor?: PropertyDescriptor) => {
       Object.defineProperty(this.prototype, key, {
         get: function() { return this["_" + key] },
@@ -62,8 +63,13 @@ export class BaseModel extends Croquet.Model {
 
       if (!this["twoWayBinds"]) this["twoWayBinds"] = {};
 
+      if (!target.constructor["propConfigs"]) target.constructor["propConfigs"] = {};
+
       if (twoWay) {
         this["twoWayBinds"][key] = true;
+        if (typeof twoWay === "number" && twoWay > 0) {
+          target.constructor["propConfigs"][key] = twoWay;
+        }
       }
     }
   }

@@ -4,6 +4,7 @@ import { RootModel } from './RootModel';
 import { RootView } from './RootView';
 import { RogueCroquet } from '.';
 
+@RE.registerComponent
 export default class CroquetConfig extends RE.Component {
   static apiKey = "";
   static appId = "";
@@ -65,6 +66,3 @@ export default class CroquetConfig extends RE.Component {
     return config;
   }
 }
-
-RE.registerComponent(CroquetConfig);
-        

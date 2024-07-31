@@ -3,6 +3,7 @@ import { RogueCroquet } from '.';
 import { Actor } from './Actor';
 import CroquetComponent from './CroquetComponent.re';
 
+@RE.registerComponent
 export default class CroquetPawn extends CroquetComponent {
   @RE.props.prefab() pawnPrefab: RE.Prefab;
   model: Actor;
@@ -18,6 +19,11 @@ export default class CroquetPawn extends CroquetComponent {
 
       this.constructor["binds"]?.forEach(key => {
         params[key] = this[key];
+      });
+
+      this.constructor["propConfigs"] && 
+      Object.entries(this.constructor["propConfigs"]).forEach(([key, value]) => {
+        this["_propConfigs"][key] = {updateTime: 0, rate: value as number};
       });
 
       this.view.publish(this.sessionId, "createActor", {
@@ -45,7 +51,7 @@ export default class CroquetPawn extends CroquetComponent {
     this.constructor["binds"]?.forEach(key => {
       this[key] = this.model[key];
       this.view.subscribe(this.model.id, key + "View", (data) => {
-        if (data.viewId === this.view.viewId) return;
+        if (data.viewId === this.view.viewId && !data.changed) return;
         this.onBeforeUpdateProp(key, data[key]);
         this[key] = data[key];
       });
@@ -54,6 +60,3 @@ export default class CroquetPawn extends CroquetComponent {
     this.init();
   }
 }
-
-RE.registerComponent(CroquetPawn);
-        

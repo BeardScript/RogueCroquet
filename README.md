@@ -214,7 +214,7 @@ This will be executed when this Model is removed an destroyed.
 
 `onBeforeUpdateProp(key: string, value: any)`
 
-This will be executed before a property **key** is updated with the given **value** by the View, using **updateProp()**
+This will be executed before a property **key** is updated with the given **value** by the View, using **updateProp()**. If you return a non-undefined value, it will use that to override the incoming value. This is especially useful to perform authoritative checks on the model.
 
 `remove()`
 
@@ -222,13 +222,13 @@ This will handle the removal and destruction of this Model.
 
 ##### Decorators
 
-`prop(twoWayBind?: boolean)`
+`prop(twoWayBind?: boolean | number)`
 
-Used on the View's propertis to generate a bind between properties of the same name in the Model. You can pass in `true` as a parameter to give write access to the prop using **updateProp**
+Used on the View's propertis to generate a bind between properties of the same name in the Model. You can pass in `true` as a parameter to give write access to the prop using **updateProp**. You can pass in a number to throttle the updateProp for that property. This helps you manage the amount of messages you're sending per second. You shouldn't send more than 20.
 
 `action()`
 
-Usen on a Method in the View's code to make it run on both the Model and the View.
+Use it on a Method in the View's code to make it run on both the Model and the View.
 
 #### Actor
 
@@ -284,9 +284,11 @@ Runs when both the Model and View have been initialized.
 
 Runs right before the property **key** is updated with the given **value** by the Model.
 
-`updateProp(key: string)`
+`updateProp(key: string, force = false)`
 
-Updates the two-way bound prop with the given **key** in the Model with its current value.
+Updates the two-way bound prop with the given **key** in the Model with its current value. You can optionally use the second parameter to **force** an update, regardless of the update rate set in the **prop()** decorator.
+
+If the update is sent, the return value will be true. If on the countrary the update is not sent, the return value will be false. If there's not update rate set on the property, this will always return true.
 
 `dampV3(from: THREE.Vector3, to: THREE.Vector3, lambda: number)`
 

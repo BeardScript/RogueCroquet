@@ -3,26 +3,27 @@ import * as THREE from 'three';
 import { Actor } from '@RE/RogueEngine/rogue-croquet/Actor';
 import CroquetPawn from '@RE/RogueEngine/rogue-croquet/CroquetPawn.re';
 import { RogueCroquet } from '@RE/RogueEngine/rogue-croquet';
+import { GameModel } from './Game.re';
 
 // To create an Actor Model we extend the Actor class.
 // The name must follow the format [component class name]Model.
 // We use the @RogueCroquet.Model decorator to register it.
 @RogueCroquet.Model
 export class PlayerModel extends Actor {
-  inputDirection = new THREE.Vector3();
-  normalizedInputDir = new THREE.Vector3();
+  /*
+    Here we can set the common interface with the component,
+    and all the Model-specific props and functions.
+  */
   position = new THREE.Vector3();
-  speed = 0.5;
+  normalizedInputDir = new THREE.Vector3();
+  speed = 1;
 
-  // This is called as shown in the GameModel.
-  update() {
-    // If we receive an inputDirection
-    if (this.inputDirection.length() > 0) {
-      // we normize the vector
-      this.normalizedInputDir.copy(this.inputDirection).normalize();
-      // and we add the normalized speed to our current position scaled by the speed.
-      this.position = this.position.addScaledVector(this.normalizedInputDir, this.speed);
-    }
+  onInit() {
+    // Get the stati GameModel
+    const gameLogicModel = this.wellKnownModel("Game") as GameModel;
+    // Use it to get a random spawn point
+    const spawnPoint = gameLogicModel.selectSpawnPoint();
+    this.position.fromArray(spawnPoint);
   }
 }
 
@@ -30,15 +31,18 @@ export class PlayerModel extends Actor {
 // that will be interconnected with the PlayerModel Actor.
 @RE.registerComponent
 export default class Player extends CroquetPawn {
+  // If using Typescript we can define the subtype of our model this way.
+  model: PlayerModel;
+
   // We use the ModelClass.prop() decorator to bind this property to one
   // with the same name in the Model.
   @PlayerModel.prop()
   position = new THREE.Vector3();
 
-  // When we pass 'true' as a parameter, we create a two-way bind. Which means we can
-  // send updates to the prop in the model using this.updateProp("propName")
-  @PlayerModel.prop(true)
   inputDirection = new THREE.Vector3();
+  normalizedInputDir = new THREE.Vector3();
+  localPos = new THREE.Vector3();
+  speed = 1;
 
   // This is called when both the Model and View are initialized.
   init() {
@@ -48,28 +52,40 @@ export default class Player extends CroquetPawn {
       this.object3d.material = new THREE.MeshStandardMaterial({color: 0x5599cc});
     }
 
-    this.object3d.position.copy(this.position);
+    // Copy the initial position from the fresh image of the model
+    this.localPos.copy(this.model.position);
+    this.object3d.position.copy(this.model.position);
   }
 
   update() {
-    // On every frame we interpolate our object3d's current position towards 
-    // the received position, using THREE.MathUtils.damp()
-    this.dampV3(this.object3d.position, this.position, 20);
+    // If this is is the Pawn under our control...
+    if (this.isMe) {
+      // we get the user input.
+      let {x: hAxis, y: vAxis} = RE.Input.getAxes("Move");
+      this.inputDirection.set(hAxis, 0, vAxis);
+      // and call our sharedLoop function passing the inputDirection.
+      this.sharedLoop(this.inputDirection);
+    }
 
-    // If this is our Pawn we want to get the user input.
-    if (this.isMe) this.getInput();
+    // Define which position we want to interpolate every frame
+    const pos = this.isMe ? this.localPos : this.position;
+    // Interpolate the position.
+    this.dampV3(this.object3d.position, pos, 20);
   }
 
-  getInput() {
-    // We get the values in the predevined "Move" Input Axis.
-    let {x: hAxis, y: vAxis} = RE.Input.getAxes("Move");
-
-    // If we provide moement input
-    if (hAxis !== this.inputDirection.x || vAxis !== this.inputDirection.z) {
-      // we set the inputDirection and use this.updateProp() to tell the Model
-      // that we need to move.
-      this.inputDirection.set(hAxis, 0, vAxis);
-      this.updateProp("inputDirection");
+  @PlayerModel.action(55)
+  sharedLoop(inputDirection: THREE.Vector3) {
+    let length = inputDirection.length();
+    // we normize the vector and multiply the length (we make sure it's not greater than 1)
+    this.normalizedInputDir.copy(inputDirection).normalize().multiplyScalar(length > 1 ? 1 : length);
+    // If we're executing this method in the model...
+    if (this instanceof PlayerModel) {
+      // we add the normalized vector scaled by the speed to the prop this.position
+      // which will be broadcasted to all clients.
+      this.position = this.position.addScaledVector(this.normalizedInputDir, this.speed);
+    } else {
+      // otherwise we do the same with this.localPos so that we can react to input immediately.
+      this.localPos.addScaledVector(this.normalizedInputDir, this.speed);
     }
   }
 }

@@ -53,10 +53,6 @@ export class RootModel extends Croquet.Model {
 
     const model = modelClass.create({viewId: params.viewId}) as Actor;
 
-    Object.keys(params.params).forEach((key) => {
-      model[key] = params.params[key];
-    });
-
     this.actors.set(model.id, {viewId: params.viewId, pawnPrefab: params.pawnPrefab, model});
     model.publish(this.sessionId, "actorCreated", {model: model, viewId: params.viewId, pawnPrefab: params.pawnPrefab});
   }
@@ -93,9 +89,6 @@ export class RootModel extends Croquet.Model {
     if (!modelClass) return;
 
     const model = modelClass.create({viewId: params.viewId}) as BaseModel;
-    Object.keys(params.params).forEach((key) => {
-      model[key] = params.params[key];
-    });
 
     if (params.isStatic) {
       model.beWellKnownAs(params.componentName);

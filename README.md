@@ -122,7 +122,7 @@ export default class MyView extends CroquetView {
 
 To communicate between Model and a View, Rogue Croquet provides a simple way to bind properties with the same name between them using the decorator `@MyModel.prop()`. This creates a one-way bind, so whenever the given property is updated in the Model, it'll be updated in the View.
 
-You can also pass in `true` as a parameter to create a two-way bind, allowing the View to update the given property using `this.updateProp("myProp")`.
+You can pass in `true` as a parameter to create a two-way bind, allowing the View to update the given property using `this.updateProp("myProp")`. Alternatively, you can pass in a `number` to set the minimum amount of milliseconds that must have passed before calling `updateProp` for that property again.
 
 It works both with regular Model-Views and Actor-Pawns.
 
@@ -167,6 +167,8 @@ export default class MyView extends CroquetView {
 
 Another way to "communicate" between Model and View is to create methods that will be executed in both. You can achieve this using the `@MyModel.action()` decorator.
 
+You can optionally pass in a `number` to set the `call rate`, this is the minimum amount of milliseconds that must pass before it can be called again.
+
 It works both with regular Model-Views and Actor-Pawns.
 
 ```typescript
@@ -175,7 +177,8 @@ export class MyPawnModel extends Actor {}
 
 @RE.registerComponent
 export default class MyPawn extends CroquetPawn {
-  @MyPawnModel.action()
+  // Define the action and it's call rate to 30ms.
+  @MyPawnModel.action(30)
   myAction() {
     // Do something in both the Model and View using common API
     if (this instanceof MyPawnModel) {
@@ -224,11 +227,11 @@ This will handle the removal and destruction of this Model.
 
 `prop(twoWayBind?: boolean | number)`
 
-Used on the View's propertis to generate a bind between properties of the same name in the Model. You can pass in `true` as a parameter to give write access to the prop using **updateProp**. You can pass in a number to throttle the updateProp for that property. This helps you manage the amount of messages you're sending per second. You shouldn't send more than 20.
+Used on the View's propertis to generate a bind between properties of the same name in the Model. You can pass in `true` as a parameter to give write access to the prop using `updateProp`. Alternatively, you can pass in a number to set the minimum amount of milliseconds that must have passed before calling `updateProp` for that property again. This helps you manage the amount of messages you're sending per second. You shouldn't send more than 20.
 
-`action()`
+`action(rate?: number)`
 
-Use it on a Method in the View's code to make it run on both the Model and the View.
+Use it on a Method in the View's code to make it run on both the Model and the View. You can pass in a number to set the minimum amount of milliseconds that must pass before it can be called again. Every time the view executes an `@action()` it's broadcasted to all clients so this helps you manage the amount of messages you're sending per second. You shouldn't send more than 20.
 
 #### Actor
 

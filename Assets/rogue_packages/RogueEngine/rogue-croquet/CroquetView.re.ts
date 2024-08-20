@@ -64,7 +64,6 @@ export default class CroquetView extends CroquetComponent {
     this.initialized = true;
 
     this.constructor["binds"]?.forEach(key => {
-      this[key] = this.model[key];
       this.view.subscribe(this.model.id, key + "View", (data) => {
         if (data.viewId === this.view.viewId && !data.changed) return;
         this.onBeforeUpdateProp(key, data[key]);

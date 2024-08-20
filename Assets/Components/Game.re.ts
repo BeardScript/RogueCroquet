@@ -1,7 +1,6 @@
 import * as RE from 'rogue-engine';
 import CroquetView from '@RE/RogueEngine/rogue-croquet/CroquetView.re';
 import { BaseModel } from '@RE/RogueEngine/rogue-croquet/BaseModel';
-import { RootModel } from '@RE/RogueEngine/rogue-croquet/RootModel';
 import { RogueCroquet } from '@RE/RogueEngine/rogue-croquet';
 
 // To create a regular Model we extend the BaseModel class.
@@ -13,21 +12,16 @@ export class GameModel extends BaseModel {
   // this model for everyone. Ideal for Game Logic and simmilar.
   isStaticModel = true;
 
-  // called internally when the model is initialized
-  onInit() {
-    this.update();
-  }
+  spawnPoints = [
+    [0, 0, 5], [5, 0, 5], [5, 0, 0], 
+    [0, 0, -5], [-3, 0, -5], [-5, 0, 0],
+    [5, 0, -5], [-5, 0, 5],
+  ];
 
-  update() {
-    // We find the RootModel in this session...
-    const rootModel = this.wellKnownModel("modelRoot") as RootModel;
-    // ...we iterate through its actors
-    rootModel?.actors?.forEach(actor => {
-      // ...and if they have an update method, we run it.
-      actor.model?.["update"] && actor.model["update"]();
-    });
-    // Then we run this method every 50 ms.
-    this.future(50).update();
+  selectSpawnPoint() {
+    // We get a random spawn point from the list using Croquet's Model.random()
+    // which lets all clients compute the exact same number in their copy of the model.
+    return this.spawnPoints[(Math.floor(this.random() * this.spawnPoints.length))];
   }
 }
 

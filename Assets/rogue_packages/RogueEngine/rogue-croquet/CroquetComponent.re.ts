@@ -28,7 +28,7 @@ export default class CroquetComponent extends RE.Component {
 
   onBeforeUpdateProp(key: string, value: any) {}
 
-  private _propConfigs: Record<string, {updateTime: number, rate: number}> = {};
+  _propConfigs: Record<string, {updateTime: number, rate: number}> = {};
 
   updateProp(key: string, force = false) {
     if (!force) {

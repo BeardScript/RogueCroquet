@@ -4,9 +4,16 @@ export class BaseModel extends Croquet.Model {
   viewId: string;
   isStaticModel = false;
 
+  _propConfigs: Record<string, {updateTime: number, rate: number}> = {};
+
   init(params: {viewId: string}) {
     super.init(params);
     this.viewId = params.viewId;
+
+    this.constructor["propConfigs"] && 
+    Object.entries(this.constructor["propConfigs"]).forEach(([key, value]) => {
+      this["_propConfigs"][key] = {updateTime: 0, rate: value as number};
+    });
 
     this["constructor"]["binds"]?.forEach(key => {
       if (!this["constructor"]["twoWayBinds"]?.[key]) return;
@@ -74,15 +81,39 @@ export class BaseModel extends Croquet.Model {
     }
   }
 
-  static action() {
+  static action(rate?: number) {
     return (target: Object, key: string, descriptor: PropertyDescriptor) => {
       const func = descriptor.value;
 
       this.prototype[key] = function(...args: []) {
+        const propConfig = this["_propConfigs"][key];
+
+        if (propConfig !== undefined) {
+          const now = this.now();
+          const dt = now - propConfig.updateTime;
+          if (dt >= propConfig.rate) {
+            propConfig.updateTime = now;
+          } else {
+            return;
+          }
+        }
+
         (func as Function).call(this, ...args);
       }
 
       descriptor.value = function(...args: []) {
+        const propConfig = this["_propConfigs"][key];
+
+        if (propConfig !== undefined) {
+          const now = Date.now();
+          const dt = now - propConfig.updateTime;
+          if (dt >= propConfig.rate) {
+            propConfig.updateTime = now;
+          } else {
+            return;
+          }
+        }
+
         (func as Function).call(this, ...args);
         this["view"].publish(this["model"].id, key, {key, args});
       }
@@ -90,6 +121,12 @@ export class BaseModel extends Croquet.Model {
       if (!this["actions"]) this["actions"] = [];
 
       this["actions"].push(key);
+
+      if (!target.constructor["propConfigs"]) target.constructor["propConfigs"] = {};
+
+      if (typeof rate === "number" && rate > 0) {
+        target.constructor["propConfigs"][key] = rate;
+      }
     }
   }
 }

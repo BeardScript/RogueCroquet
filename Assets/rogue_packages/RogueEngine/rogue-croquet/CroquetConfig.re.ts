@@ -8,6 +8,7 @@ import { RogueCroquet } from '.';
 export default class CroquetConfig extends RE.Component {
   static apiKey = "";
   static appId = "";
+  static sessionName?: string;
 
   @RE.props.text() appName = "";
   @RE.props.num(0) autoSleep = 30;
@@ -20,10 +21,10 @@ export default class CroquetConfig extends RE.Component {
 
     const config = await this.fetchConfig();
 
-    RogueCroquet.mainSession = await Croquet.Session.join({
+    RogueCroquet.activeSession = await Croquet.Session.join({
       apiKey: config.apiKey,
       appId: config.appId,
-      name: this.appName,
+      name: CroquetConfig.sessionName || this.appName,
       password: "secret",
       autoSleep: this.autoSleep,
       rejoinLimit: this.rejoinLimit,
@@ -32,27 +33,16 @@ export default class CroquetConfig extends RE.Component {
       step: "manual",
     });
 
-    RogueCroquet.activeSession = RogueCroquet.mainSession;
+    if (!RogueCroquet.mainSession) {
+      RogueCroquet.mainSession = RogueCroquet.activeSession;
+    }
 
-    RogueCroquet.sessions.set(RogueCroquet.mainSession["id"], RogueCroquet.mainSession);
+    RogueCroquet.sessions.set(RogueCroquet.activeSession["id"], RogueCroquet.activeSession);
 
-    RE.Runtime.onStop(() => {
-      RogueCroquet.sessions.forEach(session => {
-        session["view"]?.unsubscribeAll();
-        session["view"]?.detach();
-        session["leave"]();
-      });
-
-      (RogueCroquet.mainSession as any) = undefined;
-      (RogueCroquet.activeSession as any) = undefined;
-      RogueCroquet.sessions.clear();
-    });
-  }
-
-  beforeUpdate() {
-    this.time += RE.Runtime.deltaTime;
-    RogueCroquet.sessions.forEach(session => {
-      session["step"](this.time);
+    const onPlay = window["rogue-editor"]?.editorRuntime?.onPlay(() => {
+      onPlay?.stop();
+      console.log("disconnecting...");
+      RogueCroquet.disconnect();
     });
   }
 

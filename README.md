@@ -191,6 +191,93 @@ export default class MyPawn extends CroquetPawn {
 
 ```
 
+### CroquetLobby
+
+The **CroquetLoby** component is a pre-configured, extendable Lobby system that you can use in your project by simply adding it bellow the **CroquetConfig**. 
+
+This lobby system provides a powerful and simple way to match players in rooms. The default configuration will create a lobby with rooms of 1-8 players and will reload the current scene when the scene has started and hooks in the **CroquetConfig** component to connect to the given room.
+
+A Lobby is simply a session that gets stored locally in the `RogueCroquet.mainSession`. On the other hand, the room will be a session stored locally in the `RogueCroquet.activeSession`.
+
+To configure a room we need to extend both it's model and view, and then define one or more of its properties or methods to make the lobby and rooms behave in the way that we need them to.
+
+```ts
+import { RogueCroquet } from '@RE/RogueEngine/rogue-croquet';
+import { CroquetLobby, CroquetLobbyModel } from '@RE/RogueEngine/rogue-croquet/CroquetLobby.re';
+import * as RE from 'rogue-engine';
+
+@RogueCroquet.Model
+export class MyLobbyModel extends CroquetLobbyModel {
+  /** 
+   * Define your room properties to configure its behaviour.
+   * These are the default values.
+  */
+  autoMatch = true; // Whether to match players automatically.
+  allowJoinStarted = true; // Lets players join a room that has already started.
+  deleteEmptyRoom = true; // Whether to delete rooms when left vacant.
+  roomMinPlayers = 1; // The minimum amount of players needed to start a room.
+  roomMaxPlayers = 8; // The maximum amount of players allowed in a room.
+
+  match(viewId: string) {
+    // We can optionally override tis method with your own match-making logic.
+  }
+
+  /**
+   * These methods can be called to perform certain actions.
+   * This is especially useful to customize the functionality
+   * of your lobby and rooms.
+   */
+
+  createRoom(name: string, scene: string)
+  deleteRoom(name: string)
+  joinRoom(viewId: string, room: Room)
+  startRoom(room: Room)
+  leaveRoom(viewId: string)
+  leave(viewId: string);
+}
+
+@RE.registerComponent
+export default class MyLobby extends CroquetLobby {
+  // OPTIONAL you can get a list of the rooms and views in this lobby using a prop
+  // This is useful if there's no auto-match and you wish to show players the rooms they can join.
+  // It's not recommended otherwise.
+  @LobbyModel.prop() room: {name: string, views: string[], started?: boolean, scene: string}[] = [];
+  @LobbyModel.prop() views: {[viewId: string]: string} = {};
+
+  /**
+   * Name of the selected scene when creating a room.
+   * Useful, for example, to let the user select a map.
+   * If it's undefined or an empty string it'll use the current scene.
+   * IMPORTANT: Don't forget to add the Scene in the Build menu.
+   */
+  roomScene = "";
+
+  /**
+   * Name of the scene to load when going back to the lobby.
+   * If it's undefined or an empty string it'll use the current scene.
+   * IMPORTANT: Don't forget to add the Scene in the Build menu.
+   */
+  lobbyScene = "";
+
+  onJoinedLobby() {
+    // Do something when this client has joined this lobby
+  }
+
+  onJoinedRoom((room: { name: string; scene: string; started: boolean})) {
+    // Do something when this client has joined a room.
+  }
+
+  onBeforeRoomStarted(room: {name: string, scene: string}) {
+    // Do something before a room starts
+  }
+
+  onBeforeRoomEnded() {
+    // Do something before a room ends
+  }
+}
+
+```
+
 ### API
 
 #### BaseModel

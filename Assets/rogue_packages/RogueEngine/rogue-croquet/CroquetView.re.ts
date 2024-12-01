@@ -12,8 +12,8 @@ export default class CroquetView extends CroquetComponent {
 
   beforeUpdate() {
     if (!this.initialized && RogueCroquet.rootView && !this.readySubscribed) {
-      this.sessionId = RogueCroquet.activeSessionId;
-      this.view = RogueCroquet.rootView;
+      this.sessionId = this.sessionId || RogueCroquet.activeSessionId;
+      this.view = this.view || RogueCroquet.rootView;
 
       if (this.parentPawn && !this.parentPawn.model) return;
 
@@ -27,7 +27,7 @@ export default class CroquetView extends CroquetComponent {
         if (this.view.viewId !== this.parentPawn.viewId) return;
       }
 
-      this.view.subscribe(this.sessionId + this.constructor.name + "Model", "ready", this.onModelCreated);
+      this.view.subscribe(this.sessionId + this.constructor.name + "Model", "ready", this.onModelCreated.bind(this));
 
       const params = {};
 
@@ -53,7 +53,7 @@ export default class CroquetView extends CroquetComponent {
     }
   }
 
-  onModelCreated = (params: {model: Croquet.Model, viewId: string}) => {
+  onModelCreated(params: {model: Croquet.Model, viewId: string}) {
     if (this.initialized) return;
 
     this.model = params.model as BaseModel;

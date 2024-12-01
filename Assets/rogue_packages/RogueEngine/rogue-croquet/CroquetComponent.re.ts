@@ -22,7 +22,7 @@ export default class CroquetComponent extends RE.Component {
     return this.view.viewId === this.viewId;
   }
 
-  onModelCreated = (params: {model: Croquet.Model, viewId: string}) => {}
+  onModelCreated(params: {model: Croquet.Model, viewId: string}) {}
 
   init() {}
 

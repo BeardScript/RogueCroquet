@@ -53,8 +53,23 @@ export class RootView extends Croquet.View {
 
     RE.onNextFrame(() => {
       RE.onNextFrame(() => {
-        pawnComp.onModelCreated({model: actor.model, viewId: actor.viewId});
+        // pawnComp.onModelCreated({model: actor.model, viewId: actor.viewId});
+        this.tryOnModelCreated(pawnComp, actor);
       });
     });
+  }
+
+  tryOnModelCreated(pawnComp: CroquetPawn, actor: {model: Actor, viewId: string, pawnPrefab: string}) {
+    if (!pawnComp.isReady) {
+      RE.onNextFrame(() => {
+        RE.onNextFrame(() => {
+          this.tryOnModelCreated(pawnComp, actor);
+        });
+      });
+
+      return;
+    }
+
+    pawnComp.onModelCreated({model: actor.model, viewId: actor.viewId});
   }
 }

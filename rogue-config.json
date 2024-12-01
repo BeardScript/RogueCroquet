@@ -1,6 +1,11 @@
 {
   "title": "Project",
-  "scenes": [],
+  "scenes": [
+    {
+      "name": "Example",
+      "uuid": "06d2598b-e76d-429a-ac89-3987ca2135f8"
+    }
+  ],
   "projectVersion": 26,
   "lastOpenedScene": "\\Assets\\Scenes\\Example.rogueScene"
 }

@@ -2,6 +2,7 @@ import * as RE from 'rogue-engine';
 import CroquetView from '@RE/RogueEngine/rogue-croquet/CroquetView.re';
 import { BaseModel } from '@RE/RogueEngine/rogue-croquet/BaseModel';
 import { RogueCroquet } from '@RE/RogueEngine/rogue-croquet';
+import { CroquetLobby } from '@RE/RogueEngine/rogue-croquet/CroquetLobby.re';
 
 // To create a regular Model we extend the BaseModel class.
 // The name must follow the format [component class name]Model.
@@ -14,7 +15,7 @@ export class GameModel extends BaseModel {
 
   spawnPoints = [
     [0, 0, 5], [5, 0, 5], [5, 0, 0], 
-    [0, 0, -5], [-3, 0, -5], [-5, 0, 0],
+    [0, 0, -5], [-5, 0, 0], [-3, 0, -5],
     [5, 0, -5], [-5, 0, 5],
   ];
 
@@ -33,6 +34,13 @@ export default class Game extends CroquetView {
   // We create a field to drop the Prefab containing
   // our Player Actor.
   @RE.props.prefab() player: RE.Prefab;
+
+  awake() {
+    // Disable component if game hasn't started.
+    if (!CroquetLobby.gameStarted) {
+      this.enabled = false;
+    }
+  }
 
   // This is called when both the Model and View are initialized.
   init() {

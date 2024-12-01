@@ -27,4 +27,16 @@ export class RogueCroquet {
     constructor.register(constructor.name);
     RootModel.modelClasses.set(constructor.name, constructor);
   }
+
+  static disconnect() {
+    RogueCroquet.sessions.forEach(session => {
+      session["view"]?.unsubscribeAll();
+      session["view"]?.detach();
+      session["leave"]();
+    });
+
+    (RogueCroquet.mainSession as any) = undefined;
+    (RogueCroquet.activeSession as any) = undefined;
+    RogueCroquet.sessions.clear();
+  }
 }
